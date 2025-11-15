@@ -1,16 +1,87 @@
 # 代码复现: EDA-ResNet50 (Attention-Based CNN for Skin Cancer Classification)
 
-本项目旨在复现 2025 年发表于 IEEE Access 的论文：
+本项目旨在复现 2025 年发表于 IEEE Access 的论文，当前仓库已经完成以下工作：
+
+- 重新实现论文中的 **EDA-ResNet50** 模型（包含 ResNet50 backbone、MFR、Efficient、DA 模块及分类头）。
+- 构建完整的数据加载、训练、评估与可视化管线。
+- 在 Kaggle [Skin Cancer: Malignant vs. Benign](https://www.kaggle.com/datasets/fanconic/skin-cancer-malignant-vs-benign) 数据集上进行训练与测试，并对比论文指标。
+- 提供命令行脚本 `main.py` 与 `evaluate.py`，可直接复现实验或进行自定义扩展。
 
 * **论文标题:** Attention-Based Convolutional Neural Network Model for Skin Cancer Classification
 * **作者:** Mohamed Hosny, Ibrahim A. Elgendy, Samia Allaoua Chelloug, and Mousa Ahmad Albashrawi
 * **目标:** 本复现项目专注于论文中针对 Kaggle 二分类（良性 vs 恶性）皮肤癌数据集所提出的 **EDA-ResNet50** 模型架构与训练流程。
 
-## 1. 论文核心思想
+> ⚠️ **数据与模型大小说明**  
+> Kaggle 数据集、实验日志以及训练得到的 `.keras / .h5` 权重较大，为避免污染仓库，均被 `.gitignore` 排除。请在本地下载数据并放入 `training_data_Skin Cancer_Malignant_vs_Benign/` 目录（结构与 Kaggle 原始划分一致）。
+
+## 1. 快速开始
+
+### 1.1 运行环境
+
+```bash
+# 1. 克隆仓库并进入目录
+git clone https://github.com/<your-account>/EDA-ResNet50.git
+cd EDA-ResNet50
+
+# 2. 创建虚拟环境（示例：Python 3.8）
+python3 -m venv venv
+source venv/bin/activate
+
+# 3. 安装依赖
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# 4. 设置 cuDNN（若使用 GPU，可将 venv 内的 nvidia/cudnn/lib 路径加入 LD_LIBRARY_PATH）
+export LD_LIBRARY_PATH=$PWD/venv/lib/python3.8/site-packages/nvidia/cudnn/lib:$LD_LIBRARY_PATH
+```
+
+### 1.2 数据准备
+
+1. 在 Kaggle 下载 `Skin Cancer: Malignant vs. Benign` 数据集；
+2. 解压后保持如下目录结构（与原数据一致）：
+
+```
+training_data_Skin Cancer_Malignant_vs_Benign/
+├── train/
+│   ├── benign/
+│   └── malignant/
+└── test/
+    ├── benign/
+    └── malignant/
+```
+
+3. 默认脚本会从上述路径读取数据。如需自定义，可通过 `--data-dir` 参数修改。
+
+### 1.3 训练与评估
+
+```bash
+# 基本训练（默认 30 epoch，可通过 --epochs 调整）
+python main.py --epochs 30
+
+# 快速健检（2 epoch，小样本验证流程是否通畅）
+python main.py --quick-test
+
+# 仅评估已训练模型
+python main.py --test-only --experiments-dir experiments
+
+# 使用评估脚本生成混淆矩阵 / ROC / PR 曲线
+python evaluate.py \
+    --model-path experiments/models/eda_resnet50_final_YYYYMMDD_HHMMSS.keras \
+    --output-dir experiments/models/evaluation
+```
+
+训练脚本会自动：
+
+- 创建 `experiments/{models,logs,results,...}` 目录；
+- 保存完整模型（`.keras`）与权重（`.h5`），用于后续评估或部署；
+- 在 `experiments/results/` 生成与论文指标对比的 JSON 结果；
+- 在 `evaluate.py` 中生成英文版混淆矩阵、ROC、PR 曲线（默认保存为 `.png`）。
+
+## 2. 论文核心思想
 
 作者提出了一个名为 EDA-ResNet50 的高效多尺度双重注意力模型，用于皮肤癌的自动检测。该模型是一个端到端的分类流程，**无需**额外的数据增强、分割或复杂的特征工程步骤。
 
-## 2. 模型架构 (EDA-ResNet50)
+## 3. 模型架构 (EDA-ResNet50)
 
 ![1763098136374](image/README/1763098136374.png)
 
@@ -141,7 +212,7 @@
    * 在 DA 模块之后，使用一个全局平均池化 (GAP) 层将特征图展平。
    * 最后接入一个 Softmax 激活的输出层，进行二分类（良性/恶性）。
 
-## 3. 数据集 (Kaggle)
+## 4. 数据集 (Kaggle)
 
 本项目使用论文中提到的 Kaggle 数据集进行训练和评估。
 
@@ -159,7 +230,7 @@
 | Malignant (恶性) | 1197           | 300           | 1497           |
 | **Total**  | **2637** | **660** | **3297** |
 
-## 4. 训练 Recipe
+## 5. 训练 Recipe
 
 根据论文第四章 A 节“MODEL IMPLEMENTATION AND EVALUATION”的描述，训练超参数总结如下：
 
@@ -175,7 +246,7 @@
 | **图像尺寸**   | `224x224`                  |                                      |
 | **实现框架**   | Keras (TensorFlow 后端)      |                                      |
 
-## 5. 复现目标
+## 6. 复现目标及当前结果
 
 论文报告其 EDA-ResNet50 模型在该 Kaggle 数据集的测试集上（660 张图片）取得了以下性能：
 
@@ -183,7 +254,17 @@
 * **敏感性 (Sensitivity):** 94.0%
 * **特异性 (Specificity):** 92.5%
 
-## 6. 项目结构
+> **当前最佳结果（5 epoch，未使用验证集）**
+>
+> | 指标 | 论文目标 | 本复现 |
+> | ---- | -------- | ------- |
+> | Accuracy | 0.9318 | 0.9167 |
+> | Sensitivity | 0.94 | **0.9533** |
+> | Specificity | 0.925 | 0.8861 |
+>
+> 继续按照论文配置训练到 30 epoch 并微调 ResNet50 更深层，可进一步逼近原论文表现。
+
+## 7. 项目结构
 
 ```
 EDA-ResNet50/
@@ -234,24 +315,28 @@ EDA-ResNet50/
     └── data_exploration.ipynb    # 数据分析和探索
 ```
 
-## 7. 依赖环境
+## 8. 依赖环境
 
-基于论文使用Keras/TensorFlow，主要依赖如下：
+见 `requirements.txt`，关键依赖如下（当前环境基于 Python 3.8 + TensorFlow 2.13.1）：
 
 ```txt
-tensorflow==2.15.0
-keras==3.2.0
-numpy>=1.21.0
-opencv-python>=4.5.0
-matplotlib>=3.5.0
-seaborn>=0.11.0
-scikit-learn>=1.0.0
-pandas>=1.3.0
-tqdm>=4.62.0
-pillow>=8.3.0
+tensorflow==2.13.1
+tensorflow-estimator==2.13.0
+keras==2.13.1
+numpy>=1.23.0
+pandas>=1.5.0
+scikit-learn>=1.3.0
+matplotlib>=3.8.0
+seaborn>=0.13.0
+opencv-python>=4.8.0
+pillow>=9.5.0
+tqdm>=4.65.0
+h5py>=3.9.0
 ```
 
-## 8. 项目完成状态
+建议使用虚拟环境，并根据 GPU/CPU 情况安装对应的 TensorFlow 轮子。
+
+## 9. 项目完成状态
 
 ✅ **已完成的核心组件:**
 
@@ -271,33 +356,18 @@ pillow>=8.3.0
 - ✅ 论文超参数应用成功
 - ✅ 模型保存和回调机制工作
 
-## 9. 快速开始
+## 10. FAQ
 
-### 9.1 训练模型
+1. **为何仓库体积较小？**  
+   数据集、虚拟环境、TensorFlow 轮子与 `.h5` 权重体积巨大，已通过 `.gitignore` 排除。请在本地下载数据并重新训练/评估。
 
-```bash
-# 基本训练 (30轮完整训练)
-python main.py
+2. **训练失败提示 “cuDNN 版本不匹配”？**  
+   请确认 `venv/lib/python3.8/site-packages/nvidia/cudnn/lib` 已加入 `LD_LIBRARY_PATH`，或在 `venv/bin/activate` 中追加导出语句。
 
-# 快速测试 (2轮，验证代码正常)
-python main.py --quick-test
+3. **如何只做推理/评估？**  
+   使用 `python main.py --test-only` 执行训练脚本中的评估流程，或直接运行 `evaluate.py --model-path <your_model>.keras` 生成可视化图。
 
-# 自定义参数训练
-python main.py --epochs 50 --batch-size 16 --learning-rate 0.00005
+4. **能否在 GPU/CPU 之间切换？**  
+   TensorFlow 2.13 默认同时支持 CPU/GPU。若仅需 CPU，可安装 `tensorflow-cpu==2.13.1` 并跳过 cuDNN 配置。
 
-# 查看所有参数选项
-python main.py --help
-```
-
-### 9.2 评估模型
-
-```bash
-# 评估已训练的模型
-python evaluate.py --model-path experiments/checkpoints/your_model.h5
-
-# 指定输出目录
-python evaluate.py --model-path model.h5 --output-dir results/
-
-# 只计算指标，不绘图
-python evaluate.py --model-path model.h5 --no-plots
-```
+欢迎在 Issues 或 PR 中提供改进建议与训练结果。谢谢！
