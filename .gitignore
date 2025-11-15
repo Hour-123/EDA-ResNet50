@@ -1,0 +1,27 @@
+venv/
+env/
+.venv/
+miniconda3/
+
+training_data_Skin Cancer_Malignant_vs_Benign/
+training_data_Skin/
+datasets/
+data/
+
+*.pth
+*.keras
+*.h5
+*.weights
+*.pt
+logs/
+runs/
+
+__pycache__/
+*.pyc
+
+.DS_Store
+Thumbs.db
+
+.vscode/
+.idea/
+

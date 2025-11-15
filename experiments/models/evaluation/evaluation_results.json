@@ -1,0 +1,66 @@
+{
+  "evaluation_time": "2025-11-15T12:13:14.981689",
+  "model_path": "experiments/models/eda_resnet50_final_20251115_120334.keras",
+  "data_path": "/root/EDA-ResNet50/training_data_Skin Cancer_Malignant_vs_Benign",
+  "paper_targets": {
+    "accuracy": 0.9318,
+    "sensitivity": 0.94,
+    "specificity": 0.925
+  },
+  "metrics": {
+    "accuracy": 0.8939393939393939,
+    "precision": 0.8885135135135135,
+    "sensitivity": 0.8766666666666667,
+    "specificity": 0.9083333333333333,
+    "f1_score": 0.8825503355704699,
+    "precision_macro": 0.8934325809325809,
+    "recall_macro": 0.8925000000000001,
+    "f1_macro": 0.8929326263487709,
+    "auc_roc": 0,
+    "auc_pr": 0,
+    "confusion_matrix": [
+      [
+        327,
+        33
+      ],
+      [
+        37,
+        263
+      ]
+    ],
+    "total_samples": 660,
+    "correct_predictions": 590,
+    "wrong_predictions": 70
+  },
+  "class_names": [
+    "benign",
+    "malignant"
+  ],
+  "detailed_classification_report": {
+    "benign": {
+      "precision": 0.8983516483516484,
+      "recall": 0.9083333333333333,
+      "f1-score": 0.9033149171270718,
+      "support": 360.0
+    },
+    "malignant": {
+      "precision": 0.8885135135135135,
+      "recall": 0.8766666666666667,
+      "f1-score": 0.8825503355704699,
+      "support": 300.0
+    },
+    "accuracy": 0.8939393939393939,
+    "macro avg": {
+      "precision": 0.8934325809325809,
+      "recall": 0.8925000000000001,
+      "f1-score": 0.8929326263487709,
+      "support": 660.0
+    },
+    "weighted avg": {
+      "precision": 0.8938797688797688,
+      "recall": 0.8939393939393939,
+      "f1-score": 0.89387647096498,
+      "support": 660.0
+    }
+  }
+}

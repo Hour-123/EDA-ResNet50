@@ -1,0 +1,19 @@
+{
+  "test_loss": 0.3726297616958618,
+  "test_accuracy": 0.8939393758773804,
+  "sensitivity": 0.8766666666666667,
+  "specificity": 0.9083333333333333,
+  "precision": 0.8885135135135135,
+  "f1_score": 0.8825503355704699,
+  "confusion_matrix": [
+    [
+      327,
+      33
+    ],
+    [
+      37,
+      263
+    ]
+  ],
+  "classification_report": "              precision    recall  f1-score   support\n\n      benign       0.90      0.91      0.90       360\n   malignant       0.89      0.88      0.88       300\n\n    accuracy                           0.89       660\n   macro avg       0.89      0.89      0.89       660\nweighted avg       0.89      0.89      0.89       660\n"
+}
